@@ -1,0 +1,16 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: api-intelligence-mcp
+  labels:
+    app: api-intelligence-mcp
+    component: mcp-server
+spec:
+  to:
+    kind: Service
+    name: api-intelligence-mcp
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
