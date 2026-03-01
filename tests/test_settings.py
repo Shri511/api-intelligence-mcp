@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from template_mcp_server.src.settings import Settings, validate_config
+from api_intelligence_mcp.src.settings import Settings, validate_config
 
 
 class TestSettings:

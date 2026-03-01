@@ -6,12 +6,12 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from template_mcp_server.src.tools.analyze_api_response import analyze_api_response
-from template_mcp_server.src.tools.compare_api_responses import compare_api_responses
-from template_mcp_server.src.tools.generate_api_documentation import (
+from api_intelligence_mcp.src.tools.analyze_api_response import analyze_api_response
+from api_intelligence_mcp.src.tools.compare_api_responses import compare_api_responses
+from api_intelligence_mcp.src.tools.generate_api_documentation import (
     generate_api_documentation,
 )
-from template_mcp_server.src.tools.optimize_api_response_schema import (
+from api_intelligence_mcp.src.tools.optimize_api_response_schema import (
     optimize_api_response_schema,
 )
 

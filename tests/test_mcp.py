@@ -4,16 +4,16 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from template_mcp_server.src.mcp import TemplateMCPServer
+from api_intelligence_mcp.src.mcp import TemplateMCPServer
 
 
 class TestTemplateMCPServer:
     """Test the TemplateMCPServer class."""
 
-    @patch("template_mcp_server.src.mcp.force_reconfigure_all_loggers")
-    @patch("template_mcp_server.src.mcp.settings")
-    @patch("template_mcp_server.src.mcp.FastMCP")
-    @patch("template_mcp_server.src.mcp.logger")
+    @patch("api_intelligence_mcp.src.mcp.force_reconfigure_all_loggers")
+    @patch("api_intelligence_mcp.src.mcp.settings")
+    @patch("api_intelligence_mcp.src.mcp.FastMCP")
+    @patch("api_intelligence_mcp.src.mcp.logger")
     def test_init_success(
         self, mock_logger, mock_fastmcp, mock_settings, mock_force_reconfigure
     ):
@@ -34,10 +34,10 @@ class TestTemplateMCPServer:
         # In tools-first architecture, we only register tools
         mock_mcp.tool.assert_called()
 
-    @patch("template_mcp_server.src.mcp.force_reconfigure_all_loggers")
-    @patch("template_mcp_server.src.mcp.settings")
-    @patch("template_mcp_server.src.mcp.FastMCP")
-    @patch("template_mcp_server.src.mcp.logger")
+    @patch("api_intelligence_mcp.src.mcp.force_reconfigure_all_loggers")
+    @patch("api_intelligence_mcp.src.mcp.settings")
+    @patch("api_intelligence_mcp.src.mcp.FastMCP")
+    @patch("api_intelligence_mcp.src.mcp.logger")
     def test_init_failure(
         self, mock_logger, mock_fastmcp, mock_settings, mock_force_reconfigure
     ):
@@ -54,9 +54,9 @@ class TestTemplateMCPServer:
             "Failed to initialize API Intelligence MCP Server: Test error"
         )
 
-    @patch("template_mcp_server.src.mcp.force_reconfigure_all_loggers")
-    @patch("template_mcp_server.src.mcp.settings")
-    @patch("template_mcp_server.src.mcp.FastMCP")
+    @patch("api_intelligence_mcp.src.mcp.force_reconfigure_all_loggers")
+    @patch("api_intelligence_mcp.src.mcp.settings")
+    @patch("api_intelligence_mcp.src.mcp.FastMCP")
     def test_register_mcp_tools(
         self, mock_fastmcp, mock_settings, mock_force_reconfigure
     ):
@@ -73,9 +73,9 @@ class TestTemplateMCPServer:
         # Assert
         mock_mcp.tool.assert_called()
 
-    @patch("template_mcp_server.src.mcp.force_reconfigure_all_loggers")
-    @patch("template_mcp_server.src.mcp.settings")
-    @patch("template_mcp_server.src.mcp.FastMCP")
+    @patch("api_intelligence_mcp.src.mcp.force_reconfigure_all_loggers")
+    @patch("api_intelligence_mcp.src.mcp.settings")
+    @patch("api_intelligence_mcp.src.mcp.FastMCP")
     def test_register_mcp_tools_functionality(
         self, mock_fastmcp, mock_settings, mock_force_reconfigure
     ):
@@ -99,9 +99,9 @@ class TestTemplateMCPServer:
         """Test that server has required attributes for tools-first architecture."""
         # Arrange & Act
         with (
-            patch("template_mcp_server.src.mcp.settings") as mock_settings,
-            patch("template_mcp_server.src.mcp.FastMCP"),
-            patch("template_mcp_server.src.mcp.force_reconfigure_all_loggers"),
+            patch("api_intelligence_mcp.src.mcp.settings") as mock_settings,
+            patch("api_intelligence_mcp.src.mcp.FastMCP"),
+            patch("api_intelligence_mcp.src.mcp.force_reconfigure_all_loggers"),
         ):
             mock_settings.PYTHON_LOG_LEVEL = "INFO"
             server = TemplateMCPServer()
@@ -114,9 +114,9 @@ class TestTemplateMCPServer:
         """Test that server adheres to tools-first architecture by not having resource/prompt methods."""
         # Arrange & Act
         with (
-            patch("template_mcp_server.src.mcp.settings") as mock_settings,
-            patch("template_mcp_server.src.mcp.FastMCP"),
-            patch("template_mcp_server.src.mcp.force_reconfigure_all_loggers"),
+            patch("api_intelligence_mcp.src.mcp.settings") as mock_settings,
+            patch("api_intelligence_mcp.src.mcp.FastMCP"),
+            patch("api_intelligence_mcp.src.mcp.force_reconfigure_all_loggers"),
         ):
             mock_settings.PYTHON_LOG_LEVEL = "INFO"
             server = TemplateMCPServer()

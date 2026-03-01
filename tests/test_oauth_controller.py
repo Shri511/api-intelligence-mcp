@@ -4,14 +4,14 @@ import pytest
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse, RedirectResponse
 
-from template_mcp_server.src.oauth import controller
-from template_mcp_server.src.oauth.service import OAuthService
+from api_intelligence_mcp.src.oauth import controller
+from api_intelligence_mcp.src.oauth.service import OAuthService
 
 
 class TestOAuthControllerHandleCallback:
     """Test handle_callback function."""
 
-    @patch("template_mcp_server.src.oauth.controller.settings")
+    @patch("api_intelligence_mcp.src.oauth.controller.settings")
     @pytest.mark.asyncio
     async def test_handle_callback_success(self, mock_settings):
         """Test successful OAuth callback handling in production mode."""
@@ -34,7 +34,7 @@ class TestOAuthControllerHandleCallback:
         mock_token = {"access_token": "token123", "refresh_token": "refresh123"}
 
         with patch(
-            "template_mcp_server.src.oauth.controller.OAuth2Handler"
+            "api_intelligence_mcp.src.oauth.controller.OAuth2Handler"
         ) as mock_handler:
             mock_handler.get_access_token_from_authorization_code_flow.return_value = (
                 mock_token
@@ -61,7 +61,7 @@ class TestOAuthControllerHandleCallback:
             assert result.status_code == 302
             assert "code=stored_code_123" in result.headers["location"]
 
-    @patch("template_mcp_server.src.oauth.controller.settings")
+    @patch("api_intelligence_mcp.src.oauth.controller.settings")
     @pytest.mark.asyncio
     async def test_handle_callback_missing_session_data(self, mock_settings):
         """Test callback handling with missing session data in production mode."""
@@ -78,7 +78,7 @@ class TestOAuthControllerHandleCallback:
         mock_request.session = {}
 
         with patch(
-            "template_mcp_server.src.oauth.controller.OAuth2Handler"
+            "api_intelligence_mcp.src.oauth.controller.OAuth2Handler"
         ) as mock_handler:
             mock_handler.get_access_token_from_authorization_code_flow.return_value = {
                 "access_token": "token"
@@ -91,7 +91,7 @@ class TestOAuthControllerHandleCallback:
             with pytest.raises(AttributeError):
                 await controller.handle_callback(mock_request, oauth_service)
 
-    @patch("template_mcp_server.src.oauth.controller.settings")
+    @patch("api_intelligence_mcp.src.oauth.controller.settings")
     @pytest.mark.asyncio
     async def test_handle_callback_local_development(self, mock_settings):
         """Test OAuth callback handling in local development mode."""
@@ -110,10 +110,10 @@ class TestOAuthControllerHandleCallback:
 
         with (
             patch(
-                "template_mcp_server.src.oauth.controller.OAuth2Handler"
+                "api_intelligence_mcp.src.oauth.controller.OAuth2Handler"
             ) as mock_handler,
             patch(
-                "template_mcp_server.src.oauth.controller.api_module", create=True
+                "api_intelligence_mcp.src.oauth.controller.api_module", create=True
             ) as mock_api_module,
         ):
             mock_handler.get_access_token_from_authorization_code_flow.return_value = (
@@ -209,7 +209,7 @@ class TestOAuthControllerHandleAuthorize:
 class TestOAuthControllerHandleToken:
     """Test handle_token function."""
 
-    @patch("template_mcp_server.src.oauth.controller.settings")
+    @patch("api_intelligence_mcp.src.oauth.controller.settings")
     @pytest.mark.asyncio
     async def test_handle_token_authorization_code_grant(self, mock_settings):
         """Test token endpoint with authorization code grant."""
@@ -249,7 +249,7 @@ class TestOAuthControllerHandleToken:
         oauth_service.mark_code_as_used = AsyncMock()
 
         with patch(
-            "template_mcp_server.src.oauth.controller.verify_code_challenge",
+            "api_intelligence_mcp.src.oauth.controller.verify_code_challenge",
             return_value=True,
         ):
             result = await controller.handle_token(mock_request, oauth_service)
@@ -333,7 +333,7 @@ class TestOAuthControllerHandleToken:
         assert exc_info.value.status_code == 400
         assert "invalid_grant" in str(exc_info.value.detail)
 
-    @patch("template_mcp_server.src.oauth.controller.settings")
+    @patch("api_intelligence_mcp.src.oauth.controller.settings")
     @pytest.mark.asyncio
     async def test_handle_token_pkce_verification_failure(self, mock_settings):
         """Test token endpoint with PKCE verification failure."""
@@ -365,7 +365,7 @@ class TestOAuthControllerHandleToken:
         oauth_service.validate_client = AsyncMock(return_value={"id": "client123"})
 
         with patch(
-            "template_mcp_server.src.oauth.controller.verify_code_challenge",
+            "api_intelligence_mcp.src.oauth.controller.verify_code_challenge",
             return_value=False,
         ):
             with pytest.raises(HTTPException) as exc_info:
@@ -492,7 +492,7 @@ class TestOAuthControllerHandleIntrospect:
         oauth_service.retrieve_access_token = AsyncMock(return_value=token_data)
 
         with patch(
-            "template_mcp_server.src.oauth.controller.OAuth2Handler.introspect_token"
+            "api_intelligence_mcp.src.oauth.controller.OAuth2Handler.introspect_token"
         ) as mock_introspect:
             mock_introspect.return_value = {
                 "active": True,
@@ -531,7 +531,7 @@ class TestOAuthControllerHandleIntrospect:
         oauth_service.retrieve_access_token = AsyncMock(return_value=None)
 
         with patch(
-            "template_mcp_server.src.oauth.controller.OAuth2Handler.introspect_token"
+            "api_intelligence_mcp.src.oauth.controller.OAuth2Handler.introspect_token"
         ) as mock_introspect:
             mock_introspect.return_value = {"active": False}
 
@@ -688,7 +688,7 @@ class TestAuthorizationCodeGrantEdgeCases:
     @pytest.mark.asyncio
     async def test_invalid_authorization_code(self):
         """Test with invalid authorization code."""
-        from template_mcp_server.src.oauth.models import (
+        from api_intelligence_mcp.src.oauth.models import (
             AuthorizationCodeTokenRequest,
         )
 
@@ -719,13 +719,13 @@ class TestAuthorizationCodeGrantEdgeCases:
             "invalid_code"
         )
 
-    @patch("template_mcp_server.src.oauth.controller.settings")
+    @patch("api_intelligence_mcp.src.oauth.controller.settings")
     @pytest.mark.asyncio
     async def test_invalid_client_credentials(self, mock_settings):
         """Test with invalid client credentials."""
         mock_settings.COMPATIBLE_WITH_CURSOR = False
 
-        from template_mcp_server.src.oauth.models import (
+        from api_intelligence_mcp.src.oauth.models import (
             AuthorizationCodeTokenRequest,
         )
 
@@ -761,7 +761,7 @@ class TestAuthorizationCodeGrantEdgeCases:
     @pytest.mark.asyncio
     async def test_redirect_uri_mismatch(self):
         """Test with mismatched redirect URI."""
-        from template_mcp_server.src.oauth.models import (
+        from api_intelligence_mcp.src.oauth.models import (
             AuthorizationCodeTokenRequest,
         )
 
@@ -792,13 +792,13 @@ class TestAuthorizationCodeGrantEdgeCases:
         assert exc_info.value.detail["error"] == "invalid_grant"
         assert "Redirect URI mismatch" in exc_info.value.detail["error_description"]
 
-    @patch("template_mcp_server.src.oauth.controller.settings")
+    @patch("api_intelligence_mcp.src.oauth.controller.settings")
     @pytest.mark.asyncio
     async def test_pkce_verification_failure(self, mock_settings):
         """Test with PKCE verification failure."""
         mock_settings.COMPATIBLE_WITH_CURSOR = False
 
-        from template_mcp_server.src.oauth.models import (
+        from api_intelligence_mcp.src.oauth.models import (
             AuthorizationCodeTokenRequest,
         )
 
@@ -821,7 +821,7 @@ class TestAuthorizationCodeGrantEdgeCases:
         oauth_service.validate_client.return_value = {"id": "test_client"}
 
         with patch(
-            "template_mcp_server.src.oauth.controller.verify_code_challenge"
+            "api_intelligence_mcp.src.oauth.controller.verify_code_challenge"
         ) as mock_verify:
             mock_verify.return_value = False
 
@@ -838,7 +838,7 @@ class TestAuthorizationCodeGrantEdgeCases:
     @pytest.mark.asyncio
     async def test_successful_grant_with_snowflake_tokens(self):
         """Test successful authorization code grant with Snowflake tokens."""
-        from template_mcp_server.src.oauth.models import (
+        from api_intelligence_mcp.src.oauth.models import (
             AuthorizationCodeTokenRequest,
         )
 
@@ -866,7 +866,7 @@ class TestAuthorizationCodeGrantEdgeCases:
         oauth_service.mark_code_as_used = AsyncMock()
 
         with patch(
-            "template_mcp_server.src.oauth.controller.verify_code_challenge"
+            "api_intelligence_mcp.src.oauth.controller.verify_code_challenge"
         ) as mock_verify:
             mock_verify.return_value = True
 
@@ -885,7 +885,7 @@ class TestAuthorizationCodeGrantEdgeCases:
     @pytest.mark.asyncio
     async def test_successful_grant_without_snowflake_tokens(self):
         """Test successful authorization code grant without Snowflake tokens."""
-        from template_mcp_server.src.oauth.models import (
+        from api_intelligence_mcp.src.oauth.models import (
             AuthorizationCodeTokenRequest,
         )
 
@@ -909,7 +909,7 @@ class TestAuthorizationCodeGrantEdgeCases:
         oauth_service.mark_code_as_used = AsyncMock()
 
         with patch(
-            "template_mcp_server.src.oauth.controller.verify_code_challenge"
+            "api_intelligence_mcp.src.oauth.controller.verify_code_challenge"
         ) as mock_verify:
             mock_verify.return_value = True
 
@@ -932,7 +932,7 @@ class TestRefreshTokenGrantEdgeCases:
     @pytest.mark.asyncio
     async def test_invalid_refresh_token(self):
         """Test with invalid refresh token."""
-        from template_mcp_server.src.oauth.models import RefreshTokenRequest
+        from api_intelligence_mcp.src.oauth.models import RefreshTokenRequest
 
         token_request = RefreshTokenRequest(
             grant_type="refresh_token",
@@ -959,13 +959,13 @@ class TestRefreshTokenGrantEdgeCases:
             "invalid_refresh_token"
         )
 
-    @patch("template_mcp_server.src.oauth.controller.settings")
+    @patch("api_intelligence_mcp.src.oauth.controller.settings")
     @pytest.mark.asyncio
     async def test_invalid_client_credentials_refresh(self, mock_settings):
         """Test refresh token grant with invalid client credentials."""
         mock_settings.COMPATIBLE_WITH_CURSOR = False
 
-        from template_mcp_server.src.oauth.models import RefreshTokenRequest
+        from api_intelligence_mcp.src.oauth.models import RefreshTokenRequest
 
         token_request = RefreshTokenRequest(
             grant_type="refresh_token",
@@ -995,7 +995,7 @@ class TestRefreshTokenGrantEdgeCases:
     @pytest.mark.asyncio
     async def test_successful_refresh_with_snowflake_token(self):
         """Test successful refresh token grant with Snowflake token."""
-        from template_mcp_server.src.oauth.models import RefreshTokenRequest
+        from api_intelligence_mcp.src.oauth.models import RefreshTokenRequest
 
         token_request = RefreshTokenRequest(
             grant_type="refresh_token",
@@ -1014,7 +1014,7 @@ class TestRefreshTokenGrantEdgeCases:
         oauth_service.validate_client.return_value = {"id": "test_client"}
 
         with patch(
-            "template_mcp_server.src.oauth.controller.OAuth2Handler"
+            "api_intelligence_mcp.src.oauth.controller.OAuth2Handler"
         ) as mock_handler:
             mock_handler.get_access_token_from_refresh_token.return_value = {
                 "access_token": "new_snowflake_access_token",
@@ -1039,7 +1039,7 @@ class TestRefreshTokenGrantEdgeCases:
     @pytest.mark.asyncio
     async def test_snowflake_refresh_failure_fallback(self):
         """Test fallback when Snowflake token refresh fails."""
-        from template_mcp_server.src.oauth.models import RefreshTokenRequest
+        from api_intelligence_mcp.src.oauth.models import RefreshTokenRequest
 
         token_request = RefreshTokenRequest(
             grant_type="refresh_token",
@@ -1057,7 +1057,7 @@ class TestRefreshTokenGrantEdgeCases:
         oauth_service.validate_client.return_value = {"id": "test_client"}
 
         with patch(
-            "template_mcp_server.src.oauth.controller.OAuth2Handler"
+            "api_intelligence_mcp.src.oauth.controller.OAuth2Handler"
         ) as mock_handler:
             mock_handler.get_access_token_from_refresh_token.side_effect = Exception(
                 "Snowflake error"
@@ -1075,7 +1075,7 @@ class TestRefreshTokenGrantEdgeCases:
     @pytest.mark.asyncio
     async def test_successful_refresh_without_snowflake_token(self):
         """Test successful refresh token grant without Snowflake token."""
-        from template_mcp_server.src.oauth.models import RefreshTokenRequest
+        from api_intelligence_mcp.src.oauth.models import RefreshTokenRequest
 
         token_request = RefreshTokenRequest(
             grant_type="refresh_token",
@@ -1105,13 +1105,13 @@ class TestRefreshTokenGrantEdgeCases:
 class TestClientCredentialsGrantEdgeCases:
     """Test handle_client_credentials_grant_pydantic edge cases."""
 
-    @patch("template_mcp_server.src.oauth.controller.settings")
+    @patch("api_intelligence_mcp.src.oauth.controller.settings")
     @pytest.mark.asyncio
     async def test_invalid_client_credentials(self, mock_settings):
         """Test client credentials grant with invalid credentials."""
         mock_settings.COMPATIBLE_WITH_CURSOR = False
 
-        from template_mcp_server.src.oauth.models import (
+        from api_intelligence_mcp.src.oauth.models import (
             ClientCredentialsTokenRequest,
         )
 
@@ -1141,7 +1141,7 @@ class TestClientCredentialsGrantEdgeCases:
     @pytest.mark.asyncio
     async def test_successful_client_credentials_grant(self):
         """Test successful client credentials grant."""
-        from template_mcp_server.src.oauth.models import (
+        from api_intelligence_mcp.src.oauth.models import (
             ClientCredentialsTokenRequest,
         )
 
@@ -1167,7 +1167,7 @@ class TestClientCredentialsGrantEdgeCases:
     @pytest.mark.asyncio
     async def test_successful_client_credentials_grant_default_scope(self):
         """Test successful client credentials grant with default scope."""
-        from template_mcp_server.src.oauth.models import (
+        from api_intelligence_mcp.src.oauth.models import (
             ClientCredentialsTokenRequest,
         )
 
